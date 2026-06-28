@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9ᴍᴀɴ-x-ʏᴀᴍᴅʜᴜᴅ BOT | Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            padding: 16px;
+        }
+
+        /* HEADER */
+        .header { text-align: center; padding: 18px 0 22px; }
+        .header .bot-icon { font-size: 50px; display: inline-block; animation: pulse 2.5s infinite; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        .header h1 { font-size: 1.5rem; margin-top: 8px; letter-spacing: 0.04em; }
+        .header .sub { color: rgba(255,255,255,0.45); font-size: 0.8rem; margin-top: 3px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4);
+            color: #6ee7b7; border-radius: 50px; padding: 5px 14px;
+            font-size: 0.76rem; font-weight: 600; margin-top: 10px;
+        }
+        .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: blink 1.4s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+        /* LAYOUT */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 1100px; margin: 0 auto; }
+        @media(max-width:700px){ .grid{grid-template-columns:1fr;} }
+        .full-row { max-width: 1100px; margin: 14px auto 0; }
+
+        .panel {
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px; padding: 20px;
+        }
+        .panel-title {
+            font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* FORM */
+        .form-group { margin-bottom: 13px; }
+        .form-group label {
+            font-size: 0.78rem; color: rgba(255,255,255,0.65);
+            display: block; margin-bottom: 5px; font-weight: 600;
+        }
+        .form-group label .req { color: #f87171; margin-left: 3px; }
+        .input-wrap { position: relative; }
+        .input-wrap .ico {
+            position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+            font-size: 0.95rem; pointer-events: none;
+        }
+        input[type=tel], input[type=text] {
+            width: 100%; padding: 10px 11px 10px 38px;
+            background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 11px; color: #fff; font-size: 0.92rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+        input:focus { border-color: #818cf8; background: rgba(0,0,0,0.45); }
+
+        .hint { font-size: 0.68rem; color: rgba(255,255,255,0.28); margin-top: 3px; }
+
+        .admin-highlight {
+            background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 11px; padding: 10px 14px; margin-bottom: 13px;
+        }
+        .admin-highlight .admin-label {
+            font-size: 0.68rem; color: #fbbf24; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+        }
+        .admin-highlight p { font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+        .btn {
+            width: 100%; padding: 11px; border: none; border-radius: 11px;
+            font-size: 0.92rem; font-weight: 700; cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn:hover { opacity: 0.87; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .btn-sm {
+            width: auto; padding: 6px 12px; font-size: 0.75rem;
+            border-radius: 8px; border: none; cursor: pointer;
+            font-weight: 700; transition: opacity 0.2s;
+        }
+        .btn-sm:hover { opacity: 0.82; }
+        .btn-danger  { background: rgba(239,68,68,0.2);   border: 1px solid rgba(239,68,68,0.4);   color: #fca5a5; }
+        .btn-remove  { background: rgba(107,114,128,0.2); border: 1px solid rgba(107,114,128,0.35); color: #9ca3af; }
+        .btn-edit    { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.35);  color: #fcd34d; }
+
+        /* PAIRING STEP */
+        #pairStep { display: none; margin-top: 14px; }
+        .pair-box {
+            background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.35);
+            border-radius: 14px; padding: 18px; text-align: center;
+        }
+        .pair-box .pair-intro { font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+        .pair-code {
+            font-size: 2rem; font-weight: 800; letter-spacing: 0.18em;
+            color: #a5b4fc; font-family: monospace;
+            background: rgba(0,0,0,0.35); border-radius: 10px;
+            padding: 10px 20px; display: inline-block; margin: 6px 0 14px;
+        }
+        .pair-steps {
+            text-align: left; font-size: 0.77rem;
+            color: rgba(255,255,255,0.5); line-height: 2; margin-bottom: 14px;
+        }
+        .pair-steps span { color: #a5b4fc; font-weight: 700; }
+
+        /* BOT LIST */
+        #botList { min-height: 60px; }
+        .bot-item {
+            background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 13px 14px; margin-bottom: 10px;
+        }
+        .bot-item.stopped { opacity: 0.52; }
+        .bot-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .bot-info .bot-name  { font-size: 0.9rem; font-weight: 700; }
+        .bot-info .bot-num   { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .bot-info .bot-time  { font-size: 0.67rem; color: rgba(255,255,255,0.28); margin-top: 2px; }
+        .bot-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+        .status-pill {
+            font-size: 0.67rem; font-weight: 700; border-radius: 50px;
+            padding: 3px 10px; white-space: nowrap;
+        }
+        .s-live    { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.38); }
+        .s-stopped { background: rgba(239,68,68,0.13);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+
+        /* Admin row inside bot card */
+        .admin-row {
+            margin-top: 10px;
+            background: rgba(251,191,36,0.07);
+            border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 10px; padding: 8px 12px;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            flex-wrap: wrap;
+        }
+        .admin-row .admin-info { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+        .admin-row .admin-num  { font-weight: 700; color: #fcd34d; font-size: 0.82rem; }
+        .admin-row .admin-info .lbl { font-size: 0.65rem; color: rgba(255,255,255,0.35); display: block; }
+
+        /* Edit admin inline */
+        .edit-admin-form { display: none; margin-top: 8px; }
+        .edit-admin-form .row { display: flex; gap: 6px; }
+        .edit-admin-form input {
+            flex: 1; padding: 7px 10px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(251,191,36,0.35);
+            border-radius: 8px; color: #fff; font-size: 0.82rem; outline: none;
+        }
+        .edit-admin-form .save-btn {
+            padding: 7px 12px; background: #d97706; border: none;
+            border-radius: 8px; color: #fff; font-size: 0.78rem;
+            font-weight: 700; cursor: pointer;
+        }
+        .edit-admin-form .cancel-btn {
+            padding: 7px 10px; background: rgba(255,255,255,0.08); border: none;
+            border-radius: 8px; color: rgba(255,255,255,0.5); font-size: 0.78rem; cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center; color: rgba(255,255,255,0.22);
+            font-size: 0.82rem; padding: 22px 0;
+        }
+        .empty-state .big { font-size: 2rem; margin-bottom: 6px; }
+
+        /* LOGS */
+        .log-box {
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 13px; height: 200px; overflow-y: auto;
+            padding: 12px 14px; font-family: 'Courier New', monospace; font-size: 0.77rem;
+            line-height: 1.75;
+        }
+        .log-box::-webkit-scrollbar { width: 3px; }
+        .log-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+        .log-line { display: flex; gap: 10px; }
+        .log-time { color: rgba(255,255,255,0.22); min-width: 76px; }
+        .log-info    .log-msg { color: #93c5fd; }
+        .log-success .log-msg { color: #6ee7b7; }
+        .log-warn    .log-msg { color: #fcd34d; }
+        .log-error   .log-msg { color: #fca5a5; }
+        .log-msg { color: rgba(255,255,255,0.65); }
+        .log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .clear-btn {
+            font-size: 0.7rem; background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.35);
+            border-radius: 6px; padding: 3px 10px; cursor: pointer;
+        }
+        .clear-btn:hover { background: rgba(255,255,255,0.12); }
+
+        /* TOAST */
+        #toast {
+            position: fixed; bottom: 18px; right: 18px;
+            background: #1e1b4b; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 11px; padding: 11px 18px; font-size: 0.84rem;
+            color: #fff; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 999;
+        }
+        #toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="bot-icon">🤖</div>
+    <h1>9ᴍᴀɴ-x-ʏᴀᴍᴅʜᴜᴅ BOT</h1>
+    <p class="sub">WhatsApp Multi-Bot Admin Panel</p>
+    <div class="badge"><span class="dot"></span> Server Online</div>
+</div>
+
+<div class="grid">
+
+    <!-- ADD BOT FORM -->
+    <div class="panel">
+        <div class="panel-title">📱 Add New Bot</div>
+
+        <div class="admin-highlight">
+            <div class="admin-label">👑 Why Admin Number is Required</div>
+            <p>Admin number wo WhatsApp number hai jisse aap bot ko commands denge. Bina admin number ke bot kisi ki bhi baat sunne lagega — isliye yeh zaroori hai.</p>
+        </div>
+
+        <div class="form-group">
+            <label>🤖 Bot Number (WhatsApp) <span class="req">*</span></label>
+            <div class="input-wrap">
+                <span class="ico">📲</span>
+                <input type="tel" id="botNumber" placeholder="e.g. 919876543210" maxlength="15">
+            </div>
+            <p class="hint">Jis number pe bot chalana hai (country code + number)</p>
+        </div>
+
+        <div class="form-group">
+            <label>👑 Admin Number (Aapka Number) <span class="req">*</span></label>
+            <div class="input-wrap">
+                <span class="ico">📞</span>
+                <input type="tel" id="adminNumber" placeholder="e.g. 918075498750" maxlength="15">
+            </div>
+            <p class="hint">Sirf yahi number bot ko commands de sakta hai</p>
+        </div>
+
+        <div class="form-group">
+            <label>🏷️ Bot Name (Optional)</label>
+            <div class="input-wrap">
+                <span class="ico">✏️</span>
+                <input type="text" id="botName" placeholder="e.g. My Main Bot">
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="getPairBtn" onclick="requestPair()">🔑 Get Pairing Code</button>
+
+        <!-- PAIRING STEP -->
+        <div id="pairStep">
+            <div class="pair-box">
+                <p class="pair-intro">WhatsApp pe jaao → Linked Devices → Link a Device → Link with phone number</p>
+                <div class="pair-code" id="pairCode">----</div>
+                <div class="pair-steps">
+                    <span>1.</span> WhatsApp open karo phone pe<br>
+                    <span>2.</span> Settings → Linked Devices<br>
+                    <span>3.</span> "Link a Device" dabao<br>
+                    <span>4.</span> "Link with phone number instead" select karo<br>
+                    <span>5.</span> Upar diya code enter karo
+                </div>
+                <button class="btn btn-success" id="confirmBtn" onclick="confirmBot()">✅ Code enter kar diya — Bot Connect Karo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVE BOTS -->
+    <div class="panel">
+        <div class="panel-title">🤖 Active Bots</div>
+        <div id="botList">
+            <div class="empty-state">
+                <div class="big">🤖</div>
+                Abhi koi bot add nahi hai
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- LIVE LOGS -->
+<div class="full-row">
+    <div class="panel">
+        <div class="log-header">
+            <div class="panel-title" style="margin-bottom:0">📋 Live Logs</div>
+            <button class="clear-btn" onclick="clearLogs()">Clear</button>
+        </div>
+        <div class="log-box" id="logBox">
+            <div style="color:rgba(255,255,255,0.18);font-size:0.77rem;">Log stream se connect ho raha hai...</div>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    let currentPairNumber = '';
+    let currentPairAdmin  = '';
+    let currentPairName   = '';
+    let autoScroll = true;
+
+    function toast(msg, dur = 3200) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), dur);
+    }
+
+    function fmtTime(iso) {
+        return new Date(iso).toLocaleTimeString('en-IN', { hour12: false });
+    }
+    function fmtDate(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleString('en-IN', {
+            day: '2-digit', month: 'short',
+            hour: '2-digit', minute: '2-digit', hour12: false
+        });
+    }
+
+    // ── LOGS ──
+    const logBox = document.getElementById('logBox');
+
+    function appendLog(log) {
+        const init = logBox.querySelector('div[style]');
+        if (init) logBox.innerHTML = '';
+        const line = document.createElement('div');
+        line.className = `log-line log-${log.type || 'info'}`;
+        line.innerHTML = `<span class="log-time">${fmtTime(log.time)}</span><span class="log-msg">${log.message}</span>`;
+        logBox.appendChild(line);
+        if (autoScroll) logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function clearLogs() {
+        logBox.innerHTML = '<div style="color:rgba(255,255,255,0.18);font-size:0.77rem;">Logs cleared.</div>';
+    }
+
+    logBox.addEventListener('scroll', () => {
+        autoScroll = logBox.scrollTop + logBox.clientHeight >= logBox.scrollHeight - 10;
+    });
+
+    const evtSource = new EventSource('/api/logs/stream');
+    evtSource.onmessage = e => appendLog(JSON.parse(e.data));
+    evtSource.onerror   = () => {};
+
+    // ── BOTS ──
+    async function loadBots() {
+        const res  = await fetch('/api/bots');
+        const bots = await res.json();
+        renderBots(bots);
+    }
+
+    function renderBots(bots) {
+        const el = document.getElementById('botList');
+        if (!bots.length) {
+            el.innerHTML = '<div class="empty-state"><div class="big">🤖</div>Abhi koi bot add nahi hai</div>';
+            return;
+        }
+        el.innerHTML = bots.map(b => `
+            <div class="bot-item ${b.status === 'stopped' ? 'stopped' : ''}" id="bot-${b.id}">
+                <div class="bot-top">
+                    <div class="bot-info">
+                        <div class="bot-name">🤖 ${b.name}</div>
+                        <div class="bot-num">📱 +${b.number}</div>
+                        <div class="bot-time">
+                            ${b.status === 'connected'
+                                ? '🟢 Connected: ' + fmtDate(b.connectedAt)
+                                : '🔴 Stopped: '   + fmtDate(b.stoppedAt)}
+                        </div>
+                    </div>
+                    <div class="bot-actions">
+                        <span class="status-pill ${b.status === 'connected' ? 's-live' : 's-stopped'}">
+                            ${b.status === 'connected' ? '● LIVE' : '■ STOPPED'}
+                        </span>
+                        ${b.status === 'connected'
+                            ? `<button class="btn-sm btn-danger" onclick="stopBot('${b.id}')">⏹ Stop</button>`
+                            : `<button class="btn-sm btn-remove" onclick="removeBot('${b.id}')">🗑 Remove</button>`
+                        }
+                    </div>
+                </div>
+
+                <!-- Admin row -->
+                <div class="admin-row">
+                    <div class="admin-info">
+                        <span class="lbl">👑 Admin Number</span>
+                        <span class="admin-num">+${b.adminNumber || '—'}</span>
+                    </div>
+                    ${b.status === 'connected'
+                        ? `<button class="btn-sm btn-edit" onclick="toggleEditAdmin('${b.id}')">✏️ Change</button>`
+                        : ''
+                    }
+                </div>
+
+                <!-- Edit admin form (hidden by default) -->
+                <div class="edit-admin-form" id="editAdmin-${b.id}">
+                    <div class="row">
+                        <input type="tel" id="newAdmin-${b.id}" placeholder="Naya admin number (e.g. 9198XXXXXXXX)" maxlength="15">
+                        <button class="save-btn" onclick="saveAdmin('${b.id}')">Save</button>
+                        <button class="cancel-btn" onclick="toggleEditAdmin('${b.id}')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleEditAdmin(id) {
+        const form = document.getElementById(`editAdmin-${id}`);
+        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        if (form.style.display === 'block') {
+            document.getElementById(`newAdmin-${id}`).focus();
+        }
+    }
+
+    async function saveAdmin(id) {
+        const num = document.getElementById(`newAdmin-${id}`).value.trim();
+        if (!num || num.length < 10) { toast('❌ Valid admin number daalo'); return; }
+
+        const res = await fetch(`/api/bots/${id}/admin`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminNumber: num })
+        });
+        if (res.ok) { toast('✅ Admin number update ho gaya!'); loadBots(); }
+        else        { toast('❌ Update fail ho gaya'); }
+    }
+
+    // ── PAIRING ──
+    async function requestPair() {
+        const num   = document.getElementById('botNumber').value.trim();
+        const admin = document.getElementById('adminNumber').value.trim();
+        const name  = document.getElementById('botName').value.trim() || `Bot +${num}`;
+
+        if (!num   || num.length   < 10) { toast('❌ Valid bot number daalo (country code ke saath)'); return; }
+        if (!admin || admin.length < 10) { toast('❌ Admin number zaroori hai — bina iske bot control nahi hoga!'); return; }
+
+        const btn = document.getElementById('getPairBtn');
+        btn.textContent = '⏳ Request ho raha hai...';
+        btn.disabled    = true;
+
+        try {
+            const res  = await fetch('/api/pair', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ number: num, adminNumber: admin })
+            });
+            const data = await res.json();
+            if (!res.ok) { toast('❌ ' + (data.error || 'Error')); return; }
+
+            currentPairNumber = num;
+            currentPairAdmin  = admin;
+            currentPairName   = name;
+            document.getElementById('pairCode').textContent = data.code;
+            document.getElementById('pairStep').style.display = 'block';
+            toast('✅ Pairing code ready!');
+        } catch(e) {
+            toast('❌ Server error');
+        } finally {
+            btn.textContent = '🔑 Get Pairing Code';
+            btn.disabled    = false;
+        }
+    }
+
+    async function confirmBot() {
+        if (!currentPairNumber) return;
+        const btn = document.getElementById('confirmBtn');
+        btn.textContent = '⏳ Connect ho raha hai...';
+        btn.disabled    = true;
+
+        try {
+            const res  = await fetch('/api/bots', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    number:      currentPairNumber,
+                    adminNumber: currentPairAdmin,
+                    name:        currentPairName
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) { toast('❌ ' + (data.error || 'Error')); return; }
+
+            document.getElementById('pairStep').style.display = 'none';
+            document.getElementById('botNumber').value  = '';
+            document.getElementById('adminNumber').value = '';
+            document.getElementById('botName').value    = '';
+            currentPairNumber = '';
+            currentPairAdmin  = '';
+            toast('✅ Bot connected! Admin: +' + data.adminNumber);
+            loadBots();
+        } catch(e) {
+            toast('❌ Server error');
+        } finally {
+            btn.textContent = '✅ Code enter kar diya — Bot Connect Karo';
+            btn.disabled    = false;
+        }
+    }
+
+    async function stopBot(id) {
+        if (!confirm('Is bot ko stop karna chahte ho?')) return;
+        const res = await fetch(`/api/bots/${id}`, { method: 'DELETE' });
+        if (res.ok) { toast('🛑 Bot stop ho gaya'); loadBots(); }
+        else        { toast('❌ Stop fail ho gaya'); }
+    }
+
+    async function removeBot(id) {
+        if (!confirm('Bot permanently remove karna chahte ho?')) return;
+        const res = await fetch(`/api/bots/${id}/remove`, { method: 'DELETE' });
+        if (res.ok) { toast('🗑️ Bot remove ho gaya'); loadBots(); }
+        else        { toast('❌ Remove fail ho gaya'); }
+    }
+
+    // Init
+    loadBots();
+    setInterval(loadBots, 5000);
+</script>
+</body>
+</html>
