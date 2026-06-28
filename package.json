@@ -1,18 +1,22 @@
 {
   "name": "whatsapp-bot",
   "version": "1.0.0",
+  "description": "WhatsApp Bot",
   "type": "module",
   "main": "index.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^7.0.0-rc13",
-    "axios": "^1.18.1",
-    "express": "^4.22.2",
+    "@whiskeysockets/baileys": "^7.0.0-rc.13",
+    "axios": "^1.8.1",
+    "express": "^4.21.2",
     "p-queue": "^7.4.1",
-    "pino": "^9.14.0",
-    "socket.io": "^4.8.3"
+    "pino": "^9.4.0",
+    "socket.io": "^4.8.1"
   }
 }
