@@ -2320,16 +2320,25 @@ class BotManager {
             }
         } else {
             console.log(`\n🤖 [ ${BOT_NAME} SETUP ] No nodes found. Setup Primary Node.`);
-            const rlSetup = readline.createInterface({ input: process.stdin, output: process.stdout });
-            const phone = (await new Promise(r => rlSetup.question('📱 Enter Bot Phone (with country code, e.g., 918075498750): ', r))).replace(/\D/g, '');
-            if (!phone) {
-                console.error('❌ Phone number is required. Exiting.');
-                process.exit(1);
+            let phone = (process.env.BOT_PHONE || '').replace(/\D/g, '');
+
+            if (!phone && process.stdin.isTTY) {
+                // Only prompt interactively if running in a real terminal (local dev)
+                const rlSetup = readline.createInterface({ input: process.stdin, output: process.stdout });
+                phone = (await new Promise(r => rlSetup.question('📱 Enter Bot Phone (with country code, e.g., 918075498750): ', r))).replace(/\D/g, '');
+                rlSetup.close();
             }
+
+            if (!phone) {
+                console.error('❌ No BOT_PHONE env var set and no interactive terminal available.');
+                console.error('💡 On Render: add an environment variable BOT_PHONE=918075498750 in your service settings, then redeploy.');
+                // Don't crash the whole process — keep the web panel alive so the service stays up
+                return;
+            }
+
             const session = new BotSession('Bot_1', phone, this);
             this.bots.set('Bot_1', session);
             await session.connect();
-            rlSetup.close();
             this.save();
         }
         
@@ -2641,7 +2650,12 @@ console.log(`║ 📱 Allowed Admins: ${ALLOWED_ADMIN_NUMBERS.join(', ')} ║`);
 console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
 const manager = new BotManager();
-await manager.init();
+try {
+    await manager.init();
+} catch (err) {
+    console.error('❌ [STARTUP ERROR] manager.init() failed:', err.message);
+    console.error(err.stack);
+}
 startWebPanel(manager);
 
 process.on('SIGINT', () => {
